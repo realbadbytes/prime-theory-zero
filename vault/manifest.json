@@ -1,0 +1,37 @@
+{
+  "phase-1-elementary-number-theory": {
+    "file": "phase-1-elementary-number-theory.bin",
+    "key": "mw7U585p7EXuO67kG3kiTW/k+6Io+6lUCDN4WPbjiII=",
+    "sha256": "1b0598e3d9c2d57949e7a3e643497981c794794d6d450e92e07012d9479e940f"
+  },
+  "phase-2-analysis-light": {
+    "file": "phase-2-analysis-light.bin",
+    "key": "Uvmm/jN/OfjZt2Ra5W7Yk61s+X9s820nN9TUcU47BNk=",
+    "sha256": "22594d0a538c8a78ea2543f6771d6ce9b1f12fd22dc171dcf2c227c32363b9c9"
+  },
+  "phase-3-prime-distribution": {
+    "file": "phase-3-prime-distribution.bin",
+    "key": "rNrxByV6z08XeRzWraZr9ifALJbqZDzfAGUlLSU3Lb8=",
+    "sha256": "f5a56e8fd62c57fcbf045314d07655c4e8f784b06f316c6f87928ea30522c51a"
+  },
+  "phase-4-complex-analysis": {
+    "file": "phase-4-complex-analysis.bin",
+    "key": "RXEEHlX1X9748CkuBEGLwOR1gfKwyW81h+4ATPqW1XA=",
+    "sha256": "266290cd67861e6644320396d121b5cd5cc8c61582ed300fab24ee10673f637c"
+  },
+  "phase-5-rh-explicit-formula": {
+    "file": "phase-5-rh-explicit-formula.bin",
+    "key": "NvIuytgHVFvMEwO7YmdSQ85YKTrFB6IBRxq42G5wlOY=",
+    "sha256": "39e644a8a9a93e7daf2cd100a0de312d9927f955846ff1c27f9af0fb66fc84ef"
+  },
+  "phase-6-prime-gaps": {
+    "file": "phase-6-prime-gaps.bin",
+    "key": "74MKQPbL+BJpr3IlfJMKtJcY91is9ebLT+U33dPmdDY=",
+    "sha256": "208564a1da37741d92334fbceb13e13529619d860fe28cdcd2b2c064f9608d83"
+  },
+  "phase-7-specialties": {
+    "file": "phase-7-specialties.bin",
+    "key": "vFLh6XfTJBSokon2mZanwLF8EGFEK3FBdWyBe2w5DZY=",
+    "sha256": "80e3a7c3fdedd8e0b51fc19626fd2b36e5f043ba8f2a2ed18390d2d60ba22a18"
+  }
+}
