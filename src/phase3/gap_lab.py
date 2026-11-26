@@ -9,7 +9,7 @@ gap g_n = p_(n+1) - p_n. Facts you will measure:
     up toward it: models are asymptotic statements, and "asymptotic" can
     be slow
 
-Run:  python src/phase3/gap_lab.py [xmax]      (default 2e7)
+Run: python3 src/phase3/gap_lab.py [xmax]      (default 2e7)
 """
 
 import sys, os, math
@@ -80,6 +80,16 @@ in the long run -- an ocean away. That tension IS the subject.""")
     fig.savefig(png, dpi=150)
     plt.close(fig)
     print(f"\nfigure -> {png}")
+
+    print()
+    print("Think about it:")
+    print(" - Mean gap is ln x, record gap must beat the mean - why does the")
+    print("   Cramer model turn 'beat the mean' into (ln x)^2 exactly?")
+    print(" - The Maier-Pomerance constant 2e^-gamma ~ 1.122: which probabilistic")
+    print("   mistake in Cramer's naive model does it correct?")
+    print(" - Your data shows records still BELOW 2e^-gamma (ln x)^2 at this x.")
+    print("   The theorem says they EXCEED (2e^-gamma - eps)(ln x)^2 infinitely")
+    print("   often. How far out would you have to run to feel the crossing?")
 
 
 if __name__ == "__main__":

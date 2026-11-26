@@ -31,7 +31,8 @@ def questions():
                    "(mpmath count). (Integer.)"},
         {"id": "q06",
          "prompt": "Li(1e6) - pi(1e6) rounded to nearest integer (repo "
-                   "Simpson Li). (Integer.)"},
+                   "Li: int_2^x dt/ln t via u=ln t substitution, gate 2 q09). "
+                   "(Integer.)"},
         {"id": "q07",
          "prompt": "Who proved that pi(x) - Li(x) changes sign infinitely "
                    "often? Surname, lowercase. (String.)"},

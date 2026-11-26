@@ -12,10 +12,10 @@ far better. You will watch the RELATIVE error of each approximation decay,
 and see Li(x) win by orders of magnitude -- and you'll see the error
 curve's shape, which is the thing Phase 5 explains with zeros of zeta.
 
-Run:  python src/phase3/pnt_lab.py [xmax]        (default 2e7)
+Run: python3 src/phase3/pnt_lab.py [xmax]        (default 2e7)
 """
 
-import sys, os
+import sys, os, math
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import numpy as np
 import matplotlib
@@ -33,10 +33,15 @@ def main() -> None:
     pi = primes.size
     print(f"pi({xmax:,}) = {pi:,}")
 
-    X = np.logspace(1, np.log10(xmax), 40).astype(np.int64)
+    # dense log grid PLUS clean decades, so students can read pi(10^k)
+    # straight off the table to cross-check gate questions
+    Xd = np.array([10 ** k for k in range(2, int(math.floor(np.log10(xmax))) + 1)])
+    X = np.unique(np.concatenate(
+        [np.logspace(1, np.log10(xmax), 40).astype(np.int64), Xd])).astype(np.int64)
     cnt = np.searchsorted(primes, X, side="right").astype(np.float64)
     xf = X.astype(np.float64)
-    li = np.array([float(mpmath.li(float(x))) for x in X])
+    LI2 = float(mpmath.li(2.0))   # repo convention: Li(x) = int_2^x dt/ln t
+    li = np.array([float(mpmath.li(float(x))) - LI2 for x in X])
     naive = xf / np.log(xf)
 
     print(f"{'x':>12}  {'pi(x)':>10}  {'x/ln x':>10}  {'relerr%':>8}  "

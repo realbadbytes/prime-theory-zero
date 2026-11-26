@@ -1,13 +1,13 @@
 {
   "phase-1-elementary-number-theory": {
     "file": "phase-1-elementary-number-theory.bin",
-    "key": "mw7U585p7EXuO67kG3kiTW/k+6Io+6lUCDN4WPbjiII=",
-    "sha256": "1b0598e3d9c2d57949e7a3e643497981c794794d6d450e92e07012d9479e940f"
+    "key": "kjbG3kz8jdVZzXcrDlQ5rrBLvqO2sY2iurAoMZzB+lI=",
+    "sha256": "86c12eb2292731973aec713db56aaeb6bc397ef22413c028973902d542580577"
   },
   "phase-2-analysis-light": {
     "file": "phase-2-analysis-light.bin",
-    "key": "Uvmm/jN/OfjZt2Ra5W7Yk61s+X9s820nN9TUcU47BNk=",
-    "sha256": "22594d0a538c8a78ea2543f6771d6ce9b1f12fd22dc171dcf2c227c32363b9c9"
+    "key": "9Bl8ieUbIIXp/dMh1IPIWM72KcVaCZeR6aPri3Unw4E=",
+    "sha256": "cbb792674ebfc73d7dc5ca93872c557a3562f6e0f32b7ebdafdeaa663cb87cfc"
   },
   "phase-3-prime-distribution": {
     "file": "phase-3-prime-distribution.bin",
@@ -21,12 +21,12 @@
   },
   "phase-5-rh-explicit-formula": {
     "file": "phase-5-rh-explicit-formula.bin",
-    "key": "NvIuytgHVFvMEwO7YmdSQ85YKTrFB6IBRxq42G5wlOY=",
-    "sha256": "39e644a8a9a93e7daf2cd100a0de312d9927f955846ff1c27f9af0fb66fc84ef"
+    "key": "Z1AJCpi1qGk5xOoDuTnmAnUQjYRpRWiXT06FT6S4Pwg=",
+    "sha256": "73995a465b242f2aea1b38703dcda6f33a0b2ab21ceb24a566eb356991b3e8ae"
   },
   "phase-6-prime-gaps": {
     "file": "phase-6-prime-gaps.bin",
-    "key": "74MKQPbL+BJpr3IlfJMKtJcY91is9ebLT+U33dPmdDY=",
+    "key": "yM6FJQVVam4+tfm1xw4q90IYLDhKe/4/ED5uujyNsdA=",
     "sha256": "208564a1da37741d92334fbceb13e13529619d860fe28cdcd2b2c064f9608d83"
   },
   "phase-7-specialties": {

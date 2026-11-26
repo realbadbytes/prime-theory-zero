@@ -265,6 +265,9 @@ def main():
     print("\n[suite] resync, leak warning, reset")
     reset()
     pass_gate(0)
+    _, out = run("status", expect_rc=0)
+    ok("WARNING" not in out,
+       "earned module after passing its OWN gate never flagged")
     p1 = doc_path("phase-1-elementary-number-theory")
     p1.unlink()
     run("resync", expect_rc=0)
@@ -275,6 +278,18 @@ def main():
     ok("WARNING" in out, "status flags unearned plaintext (leak warning)")
     reset()
     ok(not any(doc_path(s).exists() for s in man), "reset re-locks all")
+
+    print("\n[suite] ground-truth numerical locks")
+    from gate_common import li, ls_bias_cell
+    ok(abs(li(1e6) - 78626.5039957) < 1e-3,
+       "Li(1e6) matches mpmath exactly (regression: uniform-t Simpson "
+       "silently lies by ~15)")
+    ok(abs(li(1e7) - 664917.3604) < 1e-2, "Li(1e7) machine-accurate")
+    ok(round(li(1e6)) == 78627, "gate value Li(1e6) -> 78627")
+    ok(abs(ls_bias_cell(3, 10 ** 6, 1, 1) - 0.2089) < 2e-4,
+       "LS(1,1)@1e6 = 0.2089 under primes>q convention")
+    ok(abs(ls_bias_cell(3, 10 ** 7, 1, 1) - 0.2150) < 2e-4,
+       "LS(1,1)@1e7 = 0.2150 (bias decays, doc says so)")
 
     print()
     if FAILURES:

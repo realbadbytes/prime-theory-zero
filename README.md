@@ -50,8 +50,8 @@ Modules 1–7 are **encrypted in `vault/`**. The curriculum is unlocked by
 passing programmatic checkpoints:
 
 ```bash
-python unlock.py status          # the lockboard
-python unlock.py grade 0         # prints the quiz & grades answers/phase-0.py
+python3 unlock.py status          # the lockboard
+python3 unlock.py grade 0         # prints the quiz & grades answers/phase-0.py
 ```
 
 - Each gate = 12 auto-graded questions on that phase's theorems and data,
@@ -79,13 +79,13 @@ landed — otherwise the "lock" would have been decorative.)
 ```bash
 python3 -m venv .venv && . .venv/bin/activate     # or any env you like
 pip install -r requirements.txt
-python unlock.py status                           # see the lockboard
+python3 unlock.py status                           # see the lockboard
 less curriculum/phase-0-proof-literacy.md         # read Phase 0
-python src/phase1/sieve_evolution.py              # labs are free to run
+python3 src/phase1/sieve_evolution.py              # labs are free to run
 ```
 
 Every phase doc tells you which lab belongs to which week. Labs default to
-small inputs and accept bigger ones (`python src/phase3/gap_lab.py 1e8`).
+small inputs and accept bigger ones (`python3 src/phase3/gap_lab.py 1e8`).
 
 ## The philosophy
 

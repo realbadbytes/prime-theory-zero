@@ -18,8 +18,10 @@ Tolerance is 10^-k, so rounding per the spec is exact and safe.
 def questions():
     return [
         {"id": "q01",
-         "prompt": "H_1000 - ln(1000), rounded to 4 decimals (this is "
-                   "gamma to 4 places). (Float.)"},
+         "prompt": "H_1000 - ln(1000), rounded to 4 decimals. Do NOT enter "
+                   "gamma itself: H_N - ln N approaches gamma = 0.5772... "
+                   "from ABOVE at ~ +1/2N, so N = 1000 is still visibly "
+                   "off. Compute it. (Float.)"},
         {"id": "q02",
          "prompt": "Basel partial sum: sum 1/n^2 for n=1..2000, rounded to "
                    "6 decimals. (Float.)"},
@@ -51,8 +53,11 @@ def questions():
                    "  D) f <= g eventually\n"
                    "Answer (letter)."},
         {"id": "q09",
-         "prompt": "Li(x) = integral of dt/ln t from 2 to x (Simpson, "
-                   "20000 panels -- the repo definition). Ratio "
+         "prompt": "Li(x) = integral of dt/ln t from 2 to x, repo "
+                   "definition: substitute u=ln t (gives int e^u/u du on "
+                   "[ln2, ln x]) and run Simpson with 20000 panels -- "
+                   "uniform panels in t are badly WRONG here, try it and "
+                   "compare with mpmath. Ratio "
                    "Li(1e5) / (1e5/ln(1e5)), rounded to 4 decimals. "
                    "(Float.)"},
         {"id": "q10",

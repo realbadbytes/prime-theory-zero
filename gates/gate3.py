@@ -35,7 +35,8 @@ def questions():
          "prompt": "The LARGEST prime gap below 10^6 (largest p_{n+1}-p_n "
                    "with p_n < 10^6). (Integer -- gap_lab.py territory.)"},
         {"id": "q07",
-         "prompt": "Li(10^6) (repo Simpson definition, 20000 panels), "
+         "prompt": "Li(10^6) (repo definition: u=ln t substitution + "
+                   "Simpson, 20000 panels -- see gate 2 q09), "
                    "ROUNDED TO NEAREST INTEGER. (Integer.)"},
         {"id": "q08",
          "prompt": "Cramer's predicted longest gap below 10^10: round "

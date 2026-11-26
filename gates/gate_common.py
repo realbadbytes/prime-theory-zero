@@ -12,6 +12,7 @@ there is no answer key sitting in the repo. MCQ correct values appear as
 canonical strings inside the gate sources (a study aid you can brute-force;
 this is an educational lock, not security -- see README).
 """
+import math
 import sys
 from pathlib import Path
 
@@ -72,16 +73,22 @@ def nth_prime(n):
 
 
 def li(x, steps=20000):
-    """Li(x) = Simpson integral of dt/ln t from 2 to x (the definition
-    every gate in this repo uses)."""
+    """Li(x) = int_2^x dt/ln t, the definition every gate in this repo uses.
+
+    Quadrature note (learned the hard way): uniform Simpson panels in t
+    are WRONG here -- near t=2 the integrand varies on a scale far finer
+    than (x-2)/steps, giving errors ~15 at x=1e6. The substitution
+    t = e^u turns the integral into int_{ln 2}^{ln x} e^u/u du, which is
+    smooth on a uniform u-grid: machine precision with these step counts.
+    """
     x = float(x)
     if x <= 2:
         return 0.0
-    a, b = 2.0, x
+    a, b = math.log(2.0), math.log(x)
     m = steps if steps % 2 == 0 else steps + 1
     h = (b - a) / m
-    t = np.linspace(a, b, m + 1)
-    y = 1.0 / np.log(t)
+    u = np.linspace(a, b, m + 1)
+    y = np.exp(u) / u
     s = y[0] + y[-1] + 4.0 * y[1:-1:2].sum() + 2.0 * y[2:-2:2].sum()
     return float(s * h / 3.0)
 
@@ -134,10 +141,11 @@ def gap_records(xmax):
 
 
 def ls_bias_cell(q, xmax, a, b):
-    """Fraction of consecutive-prime pairs (>= q boundary) with classes
-    (a, b) mod q. Primes start above q so 2 is handled like any prime."""
+    """Fraction of consecutive-prime pairs with classes (a, b) mod q,
+    counting only primes p > q (the LS convention for q=3: primes >= 5;
+    primes dividing q itself sit in class 0 and dilute the table)."""
     p = primes_le(xmax)
-    p = p[p >= max(q, 2)]
+    p = p[p > q]
     c = p % q
     A = c[:-1] == a
     B = c[1:] == b

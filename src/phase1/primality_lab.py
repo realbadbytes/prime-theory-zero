@@ -14,7 +14,7 @@ Facts used below are classical and can be checked in any Phase-1 book:
   * The smallest Carmichael numbers are 561, 1105, 1729 (the Hardy-Ramanujan
     taxicab number!), 2465, 2821.
 
-Run:  python src/phase1/primality_lab.py
+Run: python3 src/phase1/primality_lab.py
 """
 
 import sys, os, random

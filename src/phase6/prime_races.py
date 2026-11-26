@@ -20,7 +20,7 @@ BIAS.  Lemke Oliver & Soundararajan (2016, Annals): consecutive primes
   (the main term carries the bias!) -- one of the few bias theorems
   that is unconditional AND quantitative.
 
-Run:  python src/phase6/prime_races.py [xmax]    (default 1e7)
+Run: python3 src/phase6/prime_races.py [xmax]    (default 1e7)
 """
 
 import sys, os
@@ -125,6 +125,18 @@ def main() -> None:
     fig.savefig(png, dpi=150)
     plt.close(fig)
     print(f"\nfigure -> {png}")
+
+    print()
+    print("Think about it:")
+    print(" - The mod-4 lead persists far longer than any fair coin would. Which")
+    print("   character L-function, and which term of the explicit formula, pays")
+    print("   Chebyshev's bill?")
+    print(" - Littlewood says every race flips infinitely often (log-periodic")
+    print("   oscillations). Mod 3 refuses to flip by 7e8 - what is the honest")
+    print("   statement of what Littlewood guarantees vs where he puts it?")
+    print(" - The LS (1,1)/(2,2) deficits SHAKE as x grows (-0.041 at 1e6,")
+    print("   -0.035 at 1e7). The bias decays - is a fixed random model with")
+    print("   forbidden successors the right intuition, or still too crude?")
 
 
 if __name__ == "__main__":

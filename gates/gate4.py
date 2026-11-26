@@ -76,11 +76,15 @@ def _arg_truth(coeffs, R):
 
 
 def _check_arg_count(f):
+    # Test polynomials are chosen so NO root lies near the contour R (big
+    # margins -> stable for both np.roots and a numerical-integral student
+    # solution), AND the inside-counts are discriminating (5,2,0,5) so a
+    # lazy "return degree" cheat is rejected by tests 2 and 3.
     tests = [
-        ([1, 0, 0, 0, 3, 12], 2.0),          # straddles
-        ([1, 0, 0, 0, 3, 1], 2.0),           # all inside
-        ([1, 0, -3, 0, 2], 1.0),             # mixed
-        ([1, 0, 0, -1], 2.0),                # all inside (roots of unity)
+        ([1, 0, 0, 0, 3, 12], 2.0),          # all 5 inside
+        ([1, 0, -4.25, 0, 1], 1.3),          # z^2=4 or .25 -> +-2 out, +-0.5 in
+        ([1, 0, 0, -1], 0.5),                # cube roots of unity, all OUTSIDE
+        ([1, 0, 0, 0, 3, 1], 2.0),           # all 5 inside
     ]
     for coeffs, R in tests:
         got = f(coeffs, R)

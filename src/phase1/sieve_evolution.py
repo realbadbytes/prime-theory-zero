@@ -7,7 +7,7 @@ Three ways to list primes, run side by side:
                             but allocates n bytes at once.
   3. segmented sieve     -- same idea, constant memory (see src/common/primes.py).
 
-Run:  python src/phase1/sieve_evolution.py
+Run: python3 src/phase1/sieve_evolution.py
 
 Everything here is deliberately unoptimized: the point is to feel the
 algorithmic differences, not to win benchmarks.

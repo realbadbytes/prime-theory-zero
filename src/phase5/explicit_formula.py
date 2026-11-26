@@ -18,7 +18,7 @@ This lab computes the first zeros with mpmath and plots how the truncated
 wave sum already begins to reproduce psi(x)'s staircase -- see
 data/phase5_explicit_formula.png.
 
-Run:  python src/phase5/explicit_formula.py [num_zeros] [xmax]
+Run: python3 src/phase5/explicit_formula.py [num_zeros] [xmax]
 """
 
 import sys, os
@@ -125,6 +125,15 @@ def main() -> None:
           f"x^{{Re(rho)}}.\nRH (all Re=1/2) <=> error ~ sqrt(x) => psi(x) = x + "
           "O(sqrt(x) ln^2 x).\nThe green curve in phase3/pnt_lab.py is "
           "pi(x)-Li(x): THIS is what makes it wiggle.")
+
+    print()
+    print("Think about it:")
+    print(" - With ~20 zeros, J(x) already shadows pi(x). Which single term")
+    print("   carries the prime density, and what do the zeros ADD or SUBTRACT?")
+    print(" - Every zero contributes an oscillation of size |x^rho / rho|.")
+    print("   If ONE zero had Re(rho) = 0.6, which curve would visibly win?")
+    print(" - The corrections -ln 2 and the trivial zeros look tiny here. Find")
+    print("   the x-scale where each one stops being negligible.")
 
 
 if __name__ == "__main__":

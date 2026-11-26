@@ -70,12 +70,12 @@ vocabulary, not difficulty.
 Every phase ends at a **gate**: fill `answers/phase-N.py`, then
 
 ```bash
-python unlock.py grade N
+python3 unlock.py grade N
 ```
 
 A **perfect 100%** decrypts the next phase's document into `curriculum/`;
 anything less and it stays sealed in `vault/`, and gate N+1 refuses to run.
-`python unlock.py status` shows where you stand. The gates are auto-graded
+`python3 unlock.py status` shows where you stand. The gates are auto-graded
 against ground truth computed fresh by the shared sieve — there are no
 answer keys in this repo. (The vault is an educational lock, not real
 security; see README.)
@@ -86,6 +86,6 @@ You can read a proof of √2-irrationality in a real book and tell *which*
 line uses which tool, and you can write a direct proof that is boring,
 formal, and correct. Boring and correct is the goal; cleverness comes after.
 
-Then take the gate: read the prompts with `python unlock.py grade 0`,
+Then take the gate: read the prompts with `python3 unlock.py grade 0`,
 fill `answers/phase-0.py`, and submit. Passing unlocks Phase 1.
 Fun while you wait: `src/phase1/sieve_evolution.py` (labs are never gated).

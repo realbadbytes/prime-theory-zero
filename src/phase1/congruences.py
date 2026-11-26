@@ -7,10 +7,10 @@ The workbench for the algebraic half of elementary number theory:
   * multiplicative order and primitive roots (baby steps toward (Z/p)* structure)
   * Legendre symbol + an experimental verification of quadratic reciprocity
 
-Run:  python src/phase1/congruences.py
+Run: python3 src/phase1/congruences.py
 """
 
-import sys, os, itertools
+import sys, os, math, itertools
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from common.primes import small_sieve
 
@@ -95,7 +95,11 @@ def main() -> None:
         g = primitive_root(p)
         ords = sorted(order(a, p) for a in range(1, p))
         assert all((p - 1) % d == 0 for d in ords)      # Lagrange, felt
-        print(f"p={p:>3}: primitive root g={g:>3}; orders of all elements: {sorted(set(ords))}"
+        n_gen = sum(1 for a in range(1, p) if order(a, p) == p - 1)
+        phi = sum(1 for k in range(1, p) if math.gcd(k, p - 1) == 1)
+        assert n_gen == phi, "one generator g gives exactly phi(p-1): g^k, (k,p-1)=1"
+        print(f"p={p:>3}: primitive root g={g:>3}; primitive roots: {n_gen}"
+              f" = phi(p-1) = phi({p-1}) = {phi}; orders: {sorted(set(ords))}"
               f"  (all divide p-1={p-1})")
 
     print()

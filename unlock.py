@@ -153,7 +153,9 @@ def cmd_status(_args):
     leaks = []
     for n in range(N_GATES):
         stem = getattr(load_gate(n), "NEXT_DOC", None)
-        if stem and doc_path(stem).exists() and not gate_passed(st, n - 1):
+        # a vaulted module is legitimate only if the gate that DECRYPTS it
+        # (gate n itself) was passed
+        if stem and doc_path(stem).exists() and not gate_passed(st, n):
             leaks.append(stem)
     if leaks:
         print("\n  WARNING: unlocked modules present WITHOUT passing their "

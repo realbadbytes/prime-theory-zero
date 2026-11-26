@@ -34,34 +34,50 @@ def gate_stems():
     return stems
 
 
+def seal(stem, manifest, reseal):
+    entry_file = VAULT / f"{stem}.bin"
+    src = CURRICULUM / f"{stem}.md"
+    if not src.exists():
+        sys.exit(f"missing plaintext module: {src}")
+    plain = src.read_bytes()
+    key = secrets.token_bytes(32)
+    entry_file.write_bytes(xor(plain, key))
+    manifest[stem] = {
+        "file": entry_file.name,
+        "key": base64.b64encode(key).decode(),
+        "sha256": hashlib.sha256(plain).hexdigest(),
+    }
+    src.unlink()   # plaintext NEVER stays on disk
+    print(f"  {'re' if reseal else ''}sealed: {src.name} -> vault/{entry_file.name}")
+
+
 def main():
     VAULT.mkdir(exist_ok=True)
-    manifest = {}
+    mpath = VAULT / "manifest.json"
+    manifest = json.loads(mpath.read_text()) if mpath.exists() else {}
+    args = sys.argv[1:]
+
+    if args and args[0] in ("--reseal", "--reseal-all"):
+        # maintainer mode: plaintext docs must currently be on disk
+        # (edited while decrypted); each gets a FRESH key + sha256.
+        stems = gate_stems() if args[0] == "--reseal-all" else args[1:]
+        for stem in stems:
+            if stem not in gate_stems():
+                sys.exit(f"unknown module stem: {stem}")
+            seal(stem, manifest, reseal=True)
+        mpath.write_text(json.dumps(manifest, indent=2))
+        print(f"done: {len(stems)} module(s) resealed")
+        return
+
     made = 0
     for stem in gate_stems():
-        entry_file = VAULT / f"{stem}.bin"
-        if (VAULT / "manifest.json").exists() and entry_file.exists():
-            print(f"  already vaulted: {stem}")
+        if (VAULT / f"{stem}.bin").exists():
+            print(f"  already vaulted: {stem}   (use --reseal {stem} to update)")
             continue
-        src = CURRICULUM / f"{stem}.md"
-        if not src.exists():
-            sys.exit(f"missing plaintext module: {src}")
-        plain = src.read_bytes()
-        key = secrets.token_bytes(32)
-        entry_file.write_bytes(xor(plain, key))
-        manifest[stem] = {
-            "file": entry_file.name,
-            "key": base64.b64encode(key).decode(),
-            "sha256": hashlib.sha256(plain).hexdigest(),
-        }
-        src.unlink()
+        seal(stem, manifest, reseal=False)
         made += 1
-        print(f"  vaulted: {src.name} -> vault/{entry_file.name}")
     if made:
-        old = VAULT / "manifest.json"
-        if old.exists():
-            manifest = {**json.loads(old.read_text()), **manifest}
-        (VAULT / "manifest.json").write_text(json.dumps(manifest, indent=2))
+        mpath.write_text(json.dumps(manifest, indent=2))
     print(f"done: {made} module(s) newly sealed")
 
 

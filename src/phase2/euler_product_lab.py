@@ -11,7 +11,7 @@ Three demonstrations of the bridge identity
   3. The product side: prod_p (1-p^-s)^-1 converges to zeta(s); at s=2
      that number is pi^2/6 (Basel problem, Euler 1734).
 
-Run:  python src/phase2/euler_product_lab.py
+Run: python3 src/phase2/euler_product_lab.py
 """
 
 import sys, os
@@ -93,6 +93,16 @@ def main() -> None:
     fig.savefig(os.path.join(out, "phase2_euler_product.png"), dpi=150)
     plt.close(fig)
     print(f"\nfigure -> {out}/phase2_euler_product.png")
+
+    print()
+    print("Think about it:")
+    print(" - Each Euler factor 1/(1-p^-s) is barely above 1, yet the product")
+    print("   explodes as s -> 1+. Which line of the divergence proof turns")
+    print("   'sum 1/p diverges' into 'there are infinitely many primes'?")
+    print(" - sum_{p<=1e7} 1/p only reaches ~2.9. How slowly does ln ln x grow,")
+    print("   and what does that say about how THIN the primes are?")
+    print(" - At s = 2 the product equals pi^2/6. Circles hiding inside primes")
+    print("   is not a coincidence - what object is doing the bridging?")
 
 
 if __name__ == "__main__":
