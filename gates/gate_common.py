@@ -9,8 +9,8 @@ Answer specs are tuples:
 
 Ground truth is COMPUTED here or in the gate modules at grade time --
 there is no answer key sitting in the repo. MCQ correct values appear as
-canonical strings inside the gate sources (a study aid you can brute-force;
-this is an educational lock, not security -- see README).
+canonical strings inside the gate sources (a study aid; the lock is social,
+not cryptographic -- see README).
 """
 import math
 import sys

@@ -3,8 +3,8 @@
 
 Runs in a THROWAWAY COPY of the repo (never touches real progress).
 Scenarios: fresh status, unpassed-stub, order-lock, full 0->7 pass chain,
-certificate, reset, tamper (int/float/function), resync, leak warning,
-manifest integrity. Exit 0 + "SELFTEST OK" on success.
+certificate, reset, tamper (int/float/function), order-lock, progression.
+Exit 0 + "SELFTEST OK" on success.
 """
 import importlib.util
 import shutil
@@ -160,6 +160,12 @@ def reset():
     run("reset", "--yes", expect_rc=0)
 
 
+def passed_ids():
+    import json
+    sp = REPO / ".unlock_state" / "state.json"
+    return set(json.loads(sp.read_text())["passed"]) if sp.exists() else set()
+
+
 def pass_gate(n):
     write_answers(n)
     p, out = run("grade", n, expect_rc=0)
@@ -172,29 +178,26 @@ def main():
         ".git", "data", "__pycache__", ".unlock_state", "CERTIFICATE.txt",
         ".venv"))
 
-    print("\n[suite] structure & manifest")
-    import base64, hashlib, json
-    sys.path.insert(0, str(REPO))
-    from unlock import xor
-    man = json.loads((REPO / "vault" / "manifest.json").read_text())
-    ok(len(man) == 7, f"manifest has 7 vaulted modules (got {len(man)})")
-    bad = [s for s, e in man.items()
-           if hashlib.sha256(xor((REPO / "vault" / e["file"]).read_bytes(),
-                                 base64.b64decode(e["key"]))).hexdigest()
-           != e["sha256"]]
-    ok(not bad, f"vault sha256 integrity ({bad})")
-    ok(not any(doc_path(s).exists() for s in man),
-       "no vaulted module ships as plaintext")
-    ok((REPO / "curriculum" / "phase-0-proof-literacy.md").exists(),
-       "phase-0 ships unlocked")
+    print("\n[suite] structure (fully public curriculum, ISLP model)")
+    stems = [s for n in range(8)
+             if (s := getattr(gate_mod(n), "NEXT_DOC", None))]
+    ok(len(stems) == 7, f"7 gated lessons + phase-0 entry (got {len(stems)})")
+    ok((REPO / "curriculum" / "phase-0-proof-literacy.md").exists()
+       and all(doc_path(s).exists() for s in stems),
+       "all eight lessons ship public and plaintext")
+    ok(not (REPO / "vault").exists()
+       and not (REPO / "tools" / "build_vault.py").exists(),
+       "vault machinery fully removed")
+    thin = [s for s in stems
+            if len(doc_path(s).read_text().splitlines()) < 60]
+    ok(not thin, f"every lesson is a substantive doc (>=60 lines) {thin}")
 
     print("\n[suite] fresh student view")
     _, out = run("status", expect_rc=0)
     ok("gate 0" in out and "open" in out, "status shows gate 0 open")
     ok("locked" in out, "status shows gates 1+ locked")
     run("grade", 0, expect_rc=1)  # shipped stub = all missing
-    ok(not doc_path("phase-1-elementary-number-theory").exists(),
-       "stub answers unlock nothing")
+    ok(passed_ids() == set(), "stub answers record no progress")
     _, out = run("grade", 3, expect_rc=2)
     ok("LOCKED" in out, "order-lock: gate 3 refuses before gate 2")
 
@@ -209,7 +212,8 @@ def main():
         ok("100%" in out or "GATE PASSED" in out or "COURSE COMPLETE" in out,
            f"gate {n} perfect pass message")
         if stem:
-            ok(doc_path(stem).exists(), f"gate {n} unlocked {stem}.md")
+            ok(f"curriculum/{stem}.md" in out,
+               f"gate {n} pass points the student at {stem}.md")
     ok((REPO / "CERTIFICATE.txt").exists(), "certificate minted")
     ok("Selftest Student" in (REPO / "CERTIFICATE.txt").read_text(),
        "certificate carries the name")
@@ -223,8 +227,7 @@ def main():
     (REPO / "answers" / "phase-0.py").write_text(snips + body_t)
     p, out = run("grade", 0, expect_rc=1)
     ok("q01" in out and "incorrect" in out, "tampered int reported & failed")
-    ok(not doc_path("phase-1-elementary-number-theory").exists(),
-       "99%-gate unlocks nothing")
+    ok("0" not in passed_ids(), "99%-gate records no progress")
 
     # regression: same-size edit in the same second must NOT serve stale
     # bytecode (importlib pyc trap hit during development)
@@ -247,8 +250,7 @@ def main():
     body_t = body[:m.start(1)] + repr(bumped) + body[m.end(1):]
     (REPO / "answers" / "phase-2.py").write_text(snips + body_t)
     p, out = run("grade", 2, expect_rc=1)
-    ok(not doc_path("phase-3-prime-distribution").exists(),
-       "float outside tolerance rejected")
+    ok("2" not in passed_ids(), "float outside tolerance rejected")
 
     reset()
     for n in (0, 1, 2):
@@ -260,25 +262,23 @@ def main():
         + '"q12": _ans}\n')
     # all non-func answers removed -> they will count wrong; func wrong too
     p, out = run("grade", 3, expect_rc=1)
-    ok(not doc_path("phase-4-complex-analysis").exists(),
-       "broken function + empty answers rejected")
+    ok("3" not in passed_ids(), "broken function + empty answers rejected")
 
-    print("\n[suite] resync, leak warning, reset")
+    print("\n[suite] progression & reset")
     reset()
+    ok(all(doc_path(s).exists() for s in stems),
+       "reset leaves the public curriculum on disk")
     pass_gate(0)
+    ok("0" in passed_ids(), "state records the gate-0 pass")
     _, out = run("status", expect_rc=0)
-    ok("WARNING" not in out,
-       "earned module after passing its OWN gate never flagged")
-    p1 = doc_path("phase-1-elementary-number-theory")
-    p1.unlink()
-    run("resync", expect_rc=0)
-    ok(p1.exists(), "resync restores deleted-but-earned module")
+    ok("PASS 100%" in out, "status shows the pass")
+    _, out7 = run("grade", 7, expect_rc=2)
+    ok("LOCKED" in out7, "order-lock holds mid-course (gate 7 refused)")
     reset()
-    doc_path("phase-5-rh-explicit-formula").write_text("# contraband\n")
+    ok(passed_ids() == set(), "reset clears all progress")
     _, out = run("status", expect_rc=0)
-    ok("WARNING" in out, "status flags unearned plaintext (leak warning)")
-    reset()
-    ok(not any(doc_path(s).exists() for s in man), "reset re-locks all")
+    ok("locked" in out and "PASS" not in out,
+       "after reset gates 1+ locked again")
 
     print("\n[suite] ground-truth numerical locks")
     from gate_common import li, ls_bias_cell

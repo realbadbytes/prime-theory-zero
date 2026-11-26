@@ -23,14 +23,12 @@ the definition of implication upward.
 ## Layout
 
 ```
-unlock.py            the gate engine: status / grade / resync / reset
-curriculum/          the eight phase documents (only Phase 0 ships open)
-  phase-0-proof-literacy.md
+unlock.py            the gate engine: status / grade / reset / music
+curriculum/          ALL EIGHT guided lessons, public from day one
+  phase-0-proof-literacy.md … phase-7-specialties.md
 gates/               gate0.py … gate7.py — 12 auto-graded questions each
 answers/             your answer sheets: fill phase-N.py, submit gate N
-vault/               modules 1-7, ENCRYPTED until you pass their gate
-tools/               build_vault.py (seals modules), selftest.py (CI for
-                     the gate machinery itself)
+tools/               selftest.py (CI for the gate machinery itself)
 ROADMAP.md           the whole path on one page, with time budget
 src/                 runnable labs (developed on Python 3.14, any modern
                      3.x should do; never gated — they are your tools)
@@ -46,8 +44,11 @@ data/                figures and CSVs the labs write (git-ignored)
 
 ## Progress gates — the only way forward is through
 
-Modules 1–7 are **encrypted in `vault/`**. The curriculum is unlocked by
-passing programmatic checkpoints:
+Every lesson is public from day one — the model is
+[ISLP_labs](https://github.com/intro-stat-learning/ISLP_labs): complete
+guided theory, runnable examples, and exercises with solutions live in
+this repo; no external textbook is required to pass any gate. What is
+*gated* is your progress:
 
 ```bash
 python3 unlock.py status          # the lockboard
@@ -56,8 +57,8 @@ python3 unlock.py grade 0         # prints the quiz & grades answers/phase-0.py
 
 - Each gate = 12 auto-graded questions on that phase's theorems and data,
   including "write me a function" items tested against the shared sieve.
-- **A gate unlocks the next module only at exactly 100%.** 91.7% = still
-  sealed, and gate N+1 refuses to run until gate N is passed.
+- **Gate N+1 refuses to run until gate N is passed at exactly 100%.**
+  91.7% = not passed; fix `answers/phase-N.py` and resubmit freely.
 - The report tells you *which* questions failed, never the right answers —
   the labs print those.
 - **Ground truth is computed at grading time** from the same verified sieve
@@ -65,14 +66,11 @@ python3 unlock.py grade 0         # prints the quiz & grades answers/phase-0.py
   answer-key file anywhere in this repo.
 - Passing all eight gates mints `CERTIFICATE.txt`.
 
-Honest caveats: the vault keys live on your disk and the crypto is ~15
-lines of stdlib — this is a *pedagogical* lock whose teeth are friction and
-intent, not AES. MCQ correct values necessarily exist where the grader can
-see them, so a determined cheater can brute-force a few dozen strings in
-ten lines of Python. What you would be cheating is the only part that was
-ever for sale. (The git history is a single deliberate commit: the first
-history shipped modules 1–7 as plaintext, so it was rebuilt when the gates
-landed — otherwise the "lock" would have been decorative.)
+Honest caveat: ground truth is computed on your machine and MCQ correct
+values exist where the grader can see them, so a determined cheater can
+extract every answer in ten lines of Python. The lock is social, not
+cryptographic — what you would be cheating is the only part that was ever
+for sale.
 
 ## Quickstart
 
@@ -121,7 +119,7 @@ see `music/README.md`.
    and when folklore disagreed with the computation (it happened; see the
    mod-3 race in phase 6), the computation won and the doc was corrected.
 5. **You cannot skip ahead and pretend.** The gates grade against freshly
-   computed ground truth; 100% or the vault stays shut.
+   computed ground truth; 100% or the next gate stays locked.
 
 ## Licenses
 

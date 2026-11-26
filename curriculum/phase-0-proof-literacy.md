@@ -73,12 +73,13 @@ Every phase ends at a **gate**: fill `answers/phase-N.py`, then
 python3 unlock.py grade N
 ```
 
-A **perfect 100%** decrypts the next phase's document into `curriculum/`;
-anything less and it stays sealed in `vault/`, and gate N+1 refuses to run.
+A **perfect 100%** passes the gate and opens gate N+1; anything less and
+the next gate refuses to run. Every lesson is already public in
+`curriculum/` — the gates control *progress*, not access.
 `python3 unlock.py status` shows where you stand. The gates are auto-graded
 against ground truth computed fresh by the shared sieve — there are no
-answer keys in this repo. (The vault is an educational lock, not real
-security; see README.)
+answer keys in this repo. (The lock is social, not cryptographic; the
+certificate is for you.)
 
 ## When you're done
 

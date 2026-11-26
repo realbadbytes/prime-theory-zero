@@ -3,34 +3,30 @@
 
 Protocol
 --------
-  1. Read the current unlocked module in curriculum/.
-  2. Work its labs and exercises.
+  1. Work the current phase in curriculum/ (every lesson is fully public --
+     the model is ISLP_labs: all theory, guided code, and exercises in-repo).
+  2. Run its labs, do its exercises.
   3. Fill answers/phase-N.py  (ANSWERS = {"q01": ..., "q02": ..., ...}).
   4. python unlock.py grade N
-  5. A perfect 100% decrypts the next module into curriculum/.
-     Anything less and it stays sealed in the vault. Gate N+1 also
-     refuses to run until gate N is passed.
+  5. A perfect 100% passes the gate: gate N+1 opens. Anything less and
+     gate N+1 refuses to run until you pass.
 
 Commands
 --------
   status                 where you stand
-  grade <N>              grade answers/phase-N.py (may unlock N+1)
+  grade <N>              grade answers/phase-N.py (may open gate N+1)
   grade 7 --name "..."   finish the course (certificate)
-  resync                 re-decrypt any module you passed but lost
-  reset                  wipe ALL progress and re-lock everything
+  reset                  wipe ALL progress
   name <you>             store your display name (for the certificate)
   music [status|stop|on|off]   gate-trial soundtrack (8-bit synth or
                          your own tracks in music/; PTZ_MUSIC=0 disables)
 
-Honesty notice: this is an EDUCATIONAL lock. The vault keys sit on your
-disk and the vault format is ~15 lines of stdlib crypto; a curious student
-can open the modules early. Nothing stops them except the fact that the
-labs' ground truth, the certificate, and the point of the course all live
-on the far side of the quiz. Read the README's "Progress gates" section.
+Honesty notice: the lock is social, not cryptographic. Ground truth is
+computed live on your machine, so a curious student could extract it.
+Nothing stops them except that the certificate, the labs' intuition, and
+the entire point of the course live on the far side of doing the work.
 """
 import argparse
-import base64
-import hashlib
 import importlib.util
 import json
 import sys
@@ -40,8 +36,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 STATE_DIR = ROOT / ".unlock_state"
 STATE = STATE_DIR / "state.json"
-VAULT = ROOT / "vault"
-MANIFEST = VAULT / "manifest.json"
 GATES = ROOT / "gates"
 ANSWERS_DIR = ROOT / "answers"
 CURRICULUM = ROOT / "curriculum"
@@ -76,25 +70,6 @@ def _music_fanfare():
         _gm.fanfare()
     except Exception:
         pass
-
-
-# ------------------------------------------------------------- vault crypto
-def _keystream(key: bytes, n: int) -> bytes:
-    out = bytearray()
-    ctr = 0
-    while len(out) < n:
-        out += hashlib.sha256(key + ctr.to_bytes(8, "big")).digest()
-        ctr += 1
-    return bytes(out[:n])
-
-
-def xor(data: bytes, key: bytes) -> bytes:
-    ks = _keystream(key, len(data))
-    return bytes(a ^ b for a, b in zip(data, ks))
-
-
-def load_manifest():
-    return json.loads(MANIFEST.read_text())
 
 
 # ------------------------------------------------------------- state
@@ -143,21 +118,6 @@ def doc_path(stem):
     return CURRICULUM / f"{stem}.md"
 
 
-def unlock_doc(stem):
-    man = load_manifest()
-    if stem not in man:
-        sys.exit(f"vault has no entry for {stem!r}")
-    entry = man[stem]
-    key = base64.b64decode(entry["key"])
-    plain = xor((VAULT / entry["file"]).read_bytes(), key)
-    if hashlib.sha256(plain).hexdigest() != entry["sha256"]:
-        sys.exit("vault integrity check FAILED (manifest mismatch) -- "
-                 "repo corrupted; re-clone or run tools/build_vault.py")
-    out = doc_path(stem)
-    out.write_bytes(plain)
-    return out
-
-
 def gate_passed(st, n):
     return str(n) in st["passed"]
 
@@ -178,18 +138,6 @@ def cmd_status(_args):
         stem = getattr(gate, "NEXT_DOC", None)
         nxt = f"-> {stem}" if stem else "-> certificate"
         print(f"  gate {n}  [{mark:>18}]  {gate.TITLE}  {nxt}")
-    leaks = []
-    for n in range(N_GATES):
-        stem = getattr(load_gate(n), "NEXT_DOC", None)
-        # a vaulted module is legitimate only if the gate that DECRYPTS it
-        # (gate n itself) was passed
-        if stem and doc_path(stem).exists() and not gate_passed(st, n):
-            leaks.append(stem)
-    if leaks:
-        print("\n  WARNING: unlocked modules present WITHOUT passing their "
-              "gate:")
-        for s in leaks:
-            print(f"    curriculum/{s}.md")
     done = all(gate_passed(st, n) for n in range(N_GATES))
     if done:
         print("\n  COURSE COMPLETE. Certificate:"
@@ -255,10 +203,9 @@ def cmd_grade(args):
     if missing:
         print("  missing:  ", ", ".join(missing))
     if wrong or missing:
-        print("\n  The next module remains SEALED. Revisit the labs and "
-              "phase\ndoc, fix answers/phase-%d.py, and resubmit. The "
-              "grader does not\nreveal correct answers -- the labs do.\n"
-              % n)
+        print("\n  Gate not passed. Revisit the labs and phase doc, fix "
+              "answers/\nphase-%d.py, and resubmit. The grader does not "
+              "reveal correct\nanswers -- the labs do.\n" % n)
         sys.exit(1)
 
     # PERFECT
@@ -271,9 +218,9 @@ def cmd_grade(args):
     _music_fanfare()
     stem = getattr(gate, "NEXT_DOC", None)
     if stem:
-        out = unlock_doc(stem)
         print("  *** 100% — GATE PASSED ***\n"
-              f"  unlocked: {out.relative_to(ROOT)}\n")
+              f"  gate {n + 1} is now open — next lesson: "
+              f"{doc_path(stem).relative_to(ROOT)}\n")
     else:
         save_state(st)
         name = args.name or st.get("name") or "Anonymous Prime Hunter"
@@ -307,18 +254,6 @@ def write_certificate(st):
     CERT.write_text(cert)
 
 
-def cmd_resync(_args):
-    st = load_state()
-    count = 0
-    for n in range(N_GATES):
-        stem = getattr(load_gate(n), "NEXT_DOC", None)
-        if stem and gate_passed(st, n) and not doc_path(stem).exists():
-            unlock_doc(stem)
-            print(f"  restored curriculum/{stem}.md")
-            count += 1
-    print(f"  {count} module(s) restored." if count else "  nothing missing.")
-
-
 def cmd_reset(args):
     if _gm is not None:
         try:
@@ -326,7 +261,7 @@ def cmd_reset(args):
         except Exception:
             pass
     if not args.yes:
-        resp = input("This wipes ALL progress and re-locks every module. "
+        resp = input("This wipes ALL progress (the lessons stay public). "
                      "Type 'lock' to confirm: ")
         if resp.strip().lower() != "lock":
             print("aborted")
@@ -335,14 +270,8 @@ def cmd_reset(args):
         STATE.unlink()
     if CERT.exists():
         CERT.unlink()
-    for n in range(N_GATES):
-        stem = getattr(load_gate(n), "NEXT_DOC", None)
-        if stem:
-            p = doc_path(stem)
-            if p.exists():
-                p.unlink()
-    print("progress wiped; only Phase 0 remains unlocked (phase-0 is the "
-          "entry module and never vaulted)")
+    print("progress wiped; gate 0 open again. All lessons remain readable "
+          "in curriculum/.")
 
 
 def cmd_music(args):
@@ -400,7 +329,6 @@ def main():
     g = sub.add_parser("grade")
     g.add_argument("n", type=int)
     g.add_argument("--name", default=None)
-    sub.add_parser("resync")
     r = sub.add_parser("reset")
     r.add_argument("--yes", action="store_true")
     nm = sub.add_parser("name")
@@ -409,7 +337,7 @@ def main():
     mu.add_argument("action", nargs="?", default="status",
                     choices=["status", "stop", "on", "off"])
     args = ap.parse_args()
-    {"status": cmd_status, "grade": cmd_grade, "resync": cmd_resync,
+    {"status": cmd_status, "grade": cmd_grade,
      "reset": cmd_reset, "name": cmd_name,
      "music": cmd_music}[args.cmd](args)
 
