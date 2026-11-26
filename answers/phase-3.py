@@ -3,7 +3,7 @@
 Fill ANSWERS with one entry per question id shown by:
     python unlock.py grade 3
 (grade prints every prompt). Rules:
-  - 100% required; anything less and Phase phase-4 stays sealed.
+  - 100% required; anything less and the next gate stays locked.
   - ints exact; floats rounded exactly as the prompt says; MCQs as the
     letter string "A".."D"; booleans True/False.
   - You may import and reuse anything in src/ here (we cannot stop you
