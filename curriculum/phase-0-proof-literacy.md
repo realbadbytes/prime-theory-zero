@@ -87,5 +87,7 @@ line uses which tool, and you can write a direct proof that is boring,
 formal, and correct. Boring and correct is the goal; cleverness comes after.
 
 Then take the gate: read the prompts with `python3 unlock.py grade 0`,
-fill `answers/phase-0.py`, and submit. Passing unlocks Phase 1.
+fill `answers/phase-0.py`, and submit. Passing unlocks Phase 1. (The
+grader starts an 8-bit soundtrack for the trial if you like company —
+`python3 unlock.py music off` if you don't.)
 Fun while you wait: `src/phase1/sieve_evolution.py` (labs are never gated).

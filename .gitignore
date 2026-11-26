@@ -7,3 +7,8 @@ data/
 .DS_Store
 .unlock_state/
 CERTIFICATE.txt
+
+# personal music collection for the gate soundtrack -- never commit audio
+# you do not hold a redistribution license for
+music/*
+!music/README.md

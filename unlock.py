@@ -19,6 +19,8 @@ Commands
   resync                 re-decrypt any module you passed but lost
   reset                  wipe ALL progress and re-lock everything
   name <you>             store your display name (for the certificate)
+  music [status|stop|on|off]   gate-trial soundtrack (8-bit synth or
+                         your own tracks in music/; PTZ_MUSIC=0 disables)
 
 Honesty notice: this is an EDUCATIONAL lock. The vault keys sit on your
 disk and the vault format is ~15 lines of stdlib crypto; a curious student
@@ -47,7 +49,33 @@ CERT = ROOT / "CERTIFICATE.txt"
 N_GATES = 8  # gates 0..7
 
 sys.path.insert(0, str(GATES))
+sys.path.insert(0, str(ROOT / "tools"))
 from gate_common import match  # noqa: E402
+
+try:                                   # soundtrack is strictly optional:
+    import gate_music as _gm           # the course works with it broken
+except Exception:                      # or absent, silently
+    _gm = None
+
+
+def _music_begin(n):
+    if _gm is None:
+        return
+    try:
+        if _gm.ensure_playing(n):
+            print("  \u266a gate-trial soundtrack started  "
+                  "('unlock.py music stop' silences; 'music off' forever)")
+    except Exception:
+        pass
+
+
+def _music_fanfare():
+    if _gm is None:
+        return
+    try:
+        _gm.fanfare()
+    except Exception:
+        pass
 
 
 # ------------------------------------------------------------- vault crypto
@@ -184,6 +212,8 @@ def cmd_grade(args):
               "         python unlock.py status")
         sys.exit(2)
 
+    _music_begin(n)
+
     answers, err = load_answers(n)
     if answers is None:
         print(f"\n{err}\n")
@@ -238,6 +268,7 @@ def cmd_grade(args):
     }
     st["log"].append({"event": f"gate{n}-pass", "when":
                       st["passed"][str(n)]["when"]})
+    _music_fanfare()
     stem = getattr(gate, "NEXT_DOC", None)
     if stem:
         out = unlock_doc(stem)
@@ -289,6 +320,11 @@ def cmd_resync(_args):
 
 
 def cmd_reset(args):
+    if _gm is not None:
+        try:
+            _gm.stop()
+        except Exception:
+            pass
     if not args.yes:
         resp = input("This wipes ALL progress and re-locks every module. "
                      "Type 'lock' to confirm: ")
@@ -307,6 +343,45 @@ def cmd_reset(args):
                 p.unlink()
     print("progress wiped; only Phase 0 remains unlocked (phase-0 is the "
           "entry module and never vaulted)")
+
+
+def cmd_music(args):
+    if _gm is None:
+        print("soundtrack module unavailable (tools/gate_music.py)")
+        sys.exit(1)
+    act = args.action
+    if act == "stop":
+        print("stopped." if _gm.stop() else "nothing was playing.")
+        return
+    if act == "on":
+        _gm.set_enabled(True)
+        print("music enabled (env PTZ_MUSIC overrides this)")
+        return
+    if act == "off":
+        _gm.set_enabled(False)
+        _gm.stop()
+        print("music disabled")
+        return
+    d = _gm.status_dict()
+    print(f"\n  soundtrack:      {'on' if d['enabled'] else 'OFF'} "
+          f"(env PTZ_MUSIC wins over 'music on/off')")
+    print(f"  audio route:     {d['player']}")
+    if d["daemon_pid"]:
+        print(f"  daemon:          playing gate {d['daemon_gate']} "
+              f"(pid {d['daemon_pid']})")
+    else:
+        print("  daemon:          idle")
+    if d["own_music_tracks"]:
+        print(f"  own music:       {d['own_music_tracks']} track(s) in "
+              f"music/ -- rotating by prime index; e.g. "
+              f"{', '.join(d['own_music'])}")
+        if d["user_fanfare"]:
+            print("  own fanfare:     music/fanfare.* overrides the synth "
+                  "jingle")
+    else:
+        print("  own music:       none -- procedural chiptune synthesized "
+              "from primes (drop licensed tracks into music/ to replace it)")
+    print(f"  cache:           {d['cache']}\n")
 
 
 def cmd_name(args):
@@ -330,9 +405,13 @@ def main():
     r.add_argument("--yes", action="store_true")
     nm = sub.add_parser("name")
     nm.add_argument("you")
+    mu = sub.add_parser("music")
+    mu.add_argument("action", nargs="?", default="status",
+                    choices=["status", "stop", "on", "off"])
     args = ap.parse_args()
     {"status": cmd_status, "grade": cmd_grade, "resync": cmd_resync,
-     "reset": cmd_reset, "name": cmd_name}[args.cmd](args)
+     "reset": cmd_reset, "name": cmd_name,
+     "music": cmd_music}[args.cmd](args)
 
 
 if __name__ == "__main__":

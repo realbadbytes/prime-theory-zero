@@ -87,6 +87,28 @@ python3 src/phase1/sieve_evolution.py              # labs are free to run
 Every phase doc tells you which lab belongs to which week. Labs default to
 small inputs and accept bigger ones (`python3 src/phase3/gap_lab.py 1e8`).
 
+## Soundtrack
+
+`unlock.py grade N` starts an ethereal 8-bit soundtrack for the gate trial
+and plays a victory fanfare when you pass. There are no audio files in this
+repo — the themes are **synthesized from the mathematics itself** (each
+gate's key, tempo and melody come from the N-th prime and the digits of π),
+pure stdlib, and playback talks to your sound card directly via
+`ctypes`+libasound when no player like `mpv`/`paplay` is installed, so it
+works even on a bare tty Linux box. Controls:
+
+```bash
+python3 unlock.py music status    # what's playing / available
+python3 unlock.py music stop      # silence this trial
+python3 unlock.py music off       # off for good (or: PTZ_MUSIC=0 one-off)
+```
+
+Prefer real music? Buy some (e.g. the *Wayward Souls* OST by Joey Grady,
+joeygrady.bandcamp.com — that spooky-mathy chiptune is exactly this vibe)
+and drop the files in `music/` (git-ignored): they replace the synth and
+rotate per gate at prime indexes. Ship zero audio you don't license —
+see `music/README.md`.
+
 ## The philosophy
 
 1. **Every claim ships with a computation.** When a doc says "the Li(x)

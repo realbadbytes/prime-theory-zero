@@ -141,8 +141,9 @@ def write_answers(n, mutate=None):
 
 
 def run(*args, expect_rc=None):
+    env = {**__import__("os").environ, "PTZ_MUSIC": "0"}
     p = subprocess.run([sys.executable, "unlock.py", *map(str, args)],
-                       cwd=REPO, capture_output=True, text=True)
+                       cwd=REPO, capture_output=True, text=True, env=env)
     out = p.stdout + p.stderr
     if expect_rc is not None:
         ok(p.returncode == expect_rc,
@@ -290,6 +291,29 @@ def main():
        "LS(1,1)@1e6 = 0.2089 under primes>q convention")
     ok(abs(ls_bias_cell(3, 10 ** 7, 1, 1) - 0.2150) < 2e-4,
        "LS(1,1)@1e7 = 0.2150 (bias decays, doc says so)")
+
+    print("\n[suite] soundtrack engine")
+    sys.path.insert(0, str(ROOT / "tools"))
+    import gate_music as gm
+    import wave as _wv
+    w = gm.render_gate_wav(2, force=True)
+    with _wv.open(str(w)) as h:
+        ok(h.getnchannels() == 2 and h.getframerate() == 44100
+           and h.getnframes() > 44100 * 10,
+           "gate theme renders: stereo 44.1k, >10 s")
+        data = h.readframes(h.getnframes())
+    peak = max(abs(int.from_bytes(data[i:i + 2], "little", signed=True))
+               for i in range(0, min(len(data), 400000), 2))
+    ok(peak > 3000, f"theme has real signal (peak {peak})")
+    ok(gm.render_fanfare_wav(force=True).stat().st_size > 100_000,
+       "fanfare renders")
+    ok(gm.playlist_for(3) == [],
+       "no phantom own-music tracks leak into a clean checkout")
+    run("music", "status", expect_rc=0)
+    _, out = run("music", "stop", expect_rc=0)
+    ok("playing" in out or "stopped" in out, "music stop idempotent")
+    _, out = run("music", "off", expect_rc=0)
+    ok("disabled" in out, "music off switches config")
 
     print()
     if FAILURES:
