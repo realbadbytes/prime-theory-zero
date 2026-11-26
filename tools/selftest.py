@@ -189,8 +189,8 @@ def main():
        and not (REPO / "tools" / "build_vault.py").exists(),
        "vault machinery fully removed")
     thin = [s for s in stems
-            if len(doc_path(s).read_text().splitlines()) < 60]
-    ok(not thin, f"every lesson is a substantive doc (>=60 lines) {thin}")
+            if len(doc_path(s).read_text().splitlines()) < 150]
+    ok(not thin, f"every lesson is a substantive doc (>=150 lines) {thin}")
 
     print("\n[suite] fresh student view")
     _, out = run("status", expect_rc=0)
